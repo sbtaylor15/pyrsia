@@ -9,34 +9,11 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-workspace-osx:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: cargo check --workspace --verbose --release
-
-  check-tests-osx:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: cargo check --tests --verbose --release
-
   build-osx:
-    needs: [check-workspace-osx, check-tests-osx]
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
     - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install openssl on macOS
       run: |
@@ -51,41 +28,21 @@ jobs:
       run: |
         cargo build --workspace --verbose --release
     
+  test-osx: 
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
     - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
+
     - name: Execute Test Cases
       run: |
         cargo test --workspace --verbose --release
 
-  check-workspace:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: cargo check --workspace --verbose --release
-
-  check-tests:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: cargo check --tests --verbose --release
-
   build:
-    needs: [check-workspace, check-tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: Swatinem/rust-cache@v1
-      with:
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
@@ -106,10 +63,6 @@ jobs:
     - uses: Swatinem/rust-cache@v1
       with:
         key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-        
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose --release
 
     - name: Strip Binaries
       run: |
@@ -142,22 +95,22 @@ jobs:
         key_passphrase: ${{ secrets.GPG_SECRET }}
         github_repository: pyrsia/pyrsia.github.io
     
+  tests:
+    runs-on: ubuntu-latest
+    steps:  
+    - uses: actions/checkout@v2
+    - uses: Swatinem/rust-cache@v1
+
+    - name: Execute Test Cases
+      run: |
+        cargo test --workspace --verbose --release
+
   coverage:
-    needs: [check-tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install stable toolchain
       uses: actions-rs/toolchain@v1
