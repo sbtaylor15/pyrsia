@@ -21,11 +21,11 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - run: cargo check --workspace --verbose  --release
 
-  check-tests-osx:
+  check-tests:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -54,7 +54,17 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install openssl on macOS
       run: |
@@ -69,15 +79,6 @@ jobs:
       run: |
         cargo build --workspace --verbose  --release
     
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
     - name: Execute Test Cases
       run: |
         cargo test --workspace --verbose
@@ -94,7 +95,8 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
 
     - run: cargo check --workspace --verbose  --release
 
@@ -127,7 +129,17 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
@@ -145,16 +157,6 @@ jobs:
       run: |
         cargo build --workspace --verbose  --release
     
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-        
     - name: Execute Test Cases
       run: |
         cargo test --workspace --verbose
@@ -197,15 +199,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install stable toolchain
       uses: actions-rs/toolchain@v1
