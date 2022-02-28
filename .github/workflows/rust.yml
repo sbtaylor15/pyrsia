@@ -57,6 +57,7 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install openssl on macOS
+      run: |
         brew install openssl
 
     # Need to add build number to version number
@@ -108,6 +109,7 @@ jobs:
         cargo test --workspace --verbose
 
     - name: Strip Binaries
+      run: |
         cargo strip
 
     # Create Pyrsia .deb file
