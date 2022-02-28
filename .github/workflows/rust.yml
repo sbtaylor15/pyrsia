@@ -25,7 +25,7 @@ jobs:
 
     - run: cargo check --workspace --verbose  --release
 
-  check-tests:
+  check-tests-osx:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
