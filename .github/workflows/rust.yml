@@ -41,12 +41,9 @@ jobs:
 
     - run: cargo check --tests --verbose
 
-  build:
+  build-osx:
     needs: [check-workspace, check-tests]
-    runs-on: ${{ matrix.os }}
-    strategy:
-        matrix:
-            os: [macos-latest, ubuntu-latest]
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -60,13 +57,38 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install openssl on macOS
-      if: runner.os == 'macOS'
-      run: |
         brew install openssl
+
+    # Need to add build number to version number
+    - name: Add Build to Version Number
+      run: |
+        sed -i.bak "/^version = \"0.1.0\"/s/\"\$/+${{ github.run_number }}\"/" Cargo.toml
+
+    - name: Build Release Binaries
+      run: |
+        cargo build --workspace --verbose  --release
+    
+    - name: Execute Test Cases
+      run: |
+        cargo test --workspace --verbose
+
+  build:
+    needs: [check-workspace, check-tests]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
-      if: runner.os == 'Linux'
       uses: actions-rs/cargo@v1.0.3
       with: 
         command: install
@@ -86,13 +108,10 @@ jobs:
         cargo test --workspace --verbose
 
     - name: Strip Binaries
-      if: runner.os == 'Linux'
-      run: |
         cargo strip
 
     # Create Pyrsia .deb file
     - name: Package Pyrsia as deb file
-      if: runner.os == 'Linux'
       uses: actions-rs/cargo@v1.0.3
       with:
         command: deb
@@ -103,7 +122,7 @@ jobs:
     - name: Upload Pyrsia .deb to website repo
       uses: sbtaylor15/apt-repo-action@v2.0.4
       # Only when we push on the main repository should we upload the results
-      if: github.repository_owner == 'pyrsia' && github.event_name == 'push' && runner.os == 'Linux'
+      if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
       with:
         github_token: ${{ secrets.APT }}
         repo_supported_version: |
