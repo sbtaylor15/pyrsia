@@ -13,19 +13,43 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
+    - run: cargo check --workspace --verbose  --release
+    - uses: actions/upload-artifact@v2
       with:
-        sharedKey: workspace
-    - run: cargo check --workspace --verbose --release
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/    
 
-  build-osx:
-    needs: [check-workspace-osx]
+  check-tests-osx:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
+    - run: cargo check --tests --verbose
+    - uses: actions/upload-artifact@v2
       with:
-        sharedKey: workspace
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/ 
+
+  build-osx:
+    needs: [check-workspace-osx, check-tests-osx]
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install openssl on macOS
       run: |
@@ -38,43 +62,53 @@ jobs:
 
     - name: Build Release Binaries
       run: |
-        cargo build --workspace --verbose --release
+        cargo build --workspace --verbose  --release
     
-  test-osx:
-    needs: [check-workspace-osx]
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
-      with:
-        sharedKey: workspace
-
-    - name: Install openssl on macOS
-      run: |
-        brew install openssl 
-
     - name: Execute Test Cases
       run: |
-        cargo test --workspace --verbose --release
+        cargo test --workspace --verbose
 
   check-workspace:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
+    - run: cargo check --workspace --verbose  --release
+    - uses: actions/upload-artifact@v2
       with:
-        sharedKey: workspace
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/   
 
-    - run: cargo check --workspace --verbose --release
-
-  build:
-    needs: [check-workspace]
+  check-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
+    - run: cargo check --tests --verbose
+    - uses: actions/upload-artifact@v2
       with:
-        sharedKey: workspace
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/   
+
+  build:
+    needs: [check-workspace, check-tests]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
@@ -90,7 +124,11 @@ jobs:
 
     - name: Build Release Binaries
       run: |
-        cargo build --workspace --verbose --release
+        cargo build --workspace --verbose  --release
+        
+    - name: Execute Test Cases
+      run: |
+        cargo test --workspace --verbose
 
     - name: Strip Binaries
       run: |
@@ -122,20 +160,9 @@ jobs:
         private_key: ${{ secrets.GPG_PRIVATE }}
         key_passphrase: ${{ secrets.GPG_SECRET }}
         github_repository: pyrsia/pyrsia.github.io
-
-  test:
-    needs: [check-workspace]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
-      with:
-        sharedKey: workspace   
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose --release
-
+    
   coverage:
+    needs: [check-tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
