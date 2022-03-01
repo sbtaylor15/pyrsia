@@ -49,6 +49,7 @@ jobs:
         cat /tmp/ws.log
         echo cargo build --tests --verbose --release
         cat /tmp/tests.log
+        sccache --show-stats
 
   build:
     runs-on: ubuntu-latest
@@ -93,7 +94,8 @@ jobs:
         echo cargo build --workspace --verbose --release
         cat /tmp/ws.log
         echo cargo build --tests --verbose --release
-        cat /tmp/tests.log   
+        cat /tmp/tests.log
+        sccache --show-stats   
   
     - name: Strip Binaries
       run: |
