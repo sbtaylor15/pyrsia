@@ -39,26 +39,16 @@ jobs:
       run: |
         sed -i.bak "/^version = \"0.1.0\"/s/\"\$/+${{ github.run_number }}\"/" Cargo.toml
 
-    # Run cargo check in parallel using sscache to avoid OS locking errors
-    - run: |
-        cargo check --workspace --verbose --release 2>&1 1>/tmp/ws.log &
-        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
+    - name: Build and Test Release Binaries
+      run: |
+        set -x
+        cargo build --workspace --verbose --release 2>&1 1>/tmp/ws.log &
+        cargo build --tests --verbose --release 2>&1 1>/tmp/tests.log &
         wait
-        echo cargo check --workspace --verbose --release
+        echo cargo build --workspace --verbose --release
         cat /tmp/ws.log
-        echo cargo check --tests --verbose --release
+        echo cargo build --tests --verbose --release
         cat /tmp/tests.log
-        sccache --show-stats
-
-    - name: Build Release Binaries
-      run: |
-        cargo build --workspace --verbose --release
-        sccache --show-stats
-
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose --release
-        sccache --show-stats
 
   build:
     runs-on: ubuntu-latest
@@ -93,26 +83,17 @@ jobs:
       run: |
         sed -i.bak "/^version = \"0.1.0\"/s/\"\$/+${{ github.run_number }}\"/" Cargo.toml
 
-    # Run cargo check in parallel using sscache to avoid OS locking errors
-    - run: |
-        cargo check --workspace --verbose --release 2>&1 1>/tmp/ws.log &
-        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
+    # Run cargo build in parallel using sscache to avoid OS locking errors
+    - name: Build and Test Release Binaries
+      run: |
+        set -x
+        cargo build --workspace --verbose --release 2>&1 1>/tmp/ws.log &
+        cargo build --tests --verbose --release 2>&1 1>/tmp/tests.log &
         wait
-        echo cargo check --workspace --verbose --release
+        echo cargo build --workspace --verbose --release
         cat /tmp/ws.log
-        echo cargo check --tests --verbose --release
-        cat /tmp/tests.log
-        sccache --show-stats
-
-    - name: Build Release Binaries
-      run: |
-        cargo build --workspace --verbose --release
-        sccache --show-stats        
-        
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose --release
-        sccache --show-stats
+        echo cargo build --tests --verbose --release
+        cat /tmp/tests.log   
   
     - name: Strip Binaries
       run: |
