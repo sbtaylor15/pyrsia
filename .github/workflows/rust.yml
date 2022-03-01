@@ -9,16 +9,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-workspace-osx:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: Swatinem/rust-cache@v1.3.0
-
-    - run: cargo check --workspace --tests --release -j 10
-
   build-osx:
-    needs: [check-workspace-osx]
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -37,20 +28,21 @@ jobs:
       run: |
         cargo build --workspace --verbose  --release
     
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose
-
-  check-workspace:
-    runs-on: ubuntu-latest
+  test-osx:
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
     - uses: Swatinem/rust-cache@v1.3.0
 
-    - run: cargo check --workspace --tests --release -j 10
+    - name: Install openssl on macOS
+      run: |
+        brew install openssl
+
+    - name: Execute Test Cases
+      run: |
+        cargo test --workspace --verbose
 
   build:
-    needs: [check-workspace]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -71,10 +63,6 @@ jobs:
     - name: Build Release Binaries
       run: |
         cargo build --workspace --verbose  --release
-        
-    - name: Execute Test Cases
-      run: |
-        cargo test --workspace --verbose
 
     - name: Strip Binaries
       run: |
@@ -106,7 +94,16 @@ jobs:
         private_key: ${{ secrets.GPG_PRIVATE }}
         key_passphrase: ${{ secrets.GPG_SECRET }}
         github_repository: pyrsia/pyrsia.github.io
-    
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: Swatinem/rust-cache@v1.3.0        
+    - name: Execute Test Cases
+      run: |
+        cargo test --workspace --verbose
+
   coverage:
     runs-on: ubuntu-latest
     steps:
