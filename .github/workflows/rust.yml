@@ -14,30 +14,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: cargo check --workspace --verbose  --release
+    - run: |
+        zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ target/
+        unzip -l cache.zip
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/    
+        path: cache.zip
 
   check-tests-osx:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
     - run: cargo check --tests --verbose
+    - run: |
+        zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ target/
+        unzip -l cache.zip
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/ 
+        path: cache.zip
 
   build-osx:
     needs: [check-workspace-osx, check-tests-osx]
@@ -73,30 +69,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: cargo check --workspace --verbose  --release
+    - run: |
+        zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ target/
+        unzip -l cache.zip
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/   
+        path: cache.zip 
 
   check-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: cargo check --tests --verbose
+    - run: |
+        zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ target/
+        unzip -l cache.zip
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/   
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
+        path: cache.zip 
 
   build:
     needs: [check-workspace, check-tests]
