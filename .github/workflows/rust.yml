@@ -14,18 +14,19 @@ jobs:
     env: 
       RUSTC_WRAPPER: /Users/runner/.cargo/bin/sccache   
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
   
+    # Use sscache store in GitHub cache
+    - uses: actions/cache@v2
+      with:
+        path: /Users/runner/Library/Caches/Mozilla.sccache
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
     # Install sccache from binary
     - run: |
         .github/workflows/sccache-macos.sh
         sccache --start-server
-
-    # Use sscache store in GitHub cache
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/sccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        sccache --show-stats
 
     - name: Install openssl on macOS
       run: |
@@ -46,18 +47,19 @@ jobs:
     env:
       RUSTC_WRAPPER: /home/runner/.cargo/bin/sccache     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    # Use sscache store in GitHub cache
+    - uses: actions/cache@v2
+      with:
+        path: /home/runner/.cache/sccache
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     # Install sccache from binary
     - run: |
         .github/workflows/sccache-linux.sh
         sccache --start-server
-    
-    # Use sscache store in GitHub cache
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/sccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        sccache --show-stats
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
@@ -112,7 +114,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -138,7 +140,7 @@ jobs:
     needs: [build]
     if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 2
 
