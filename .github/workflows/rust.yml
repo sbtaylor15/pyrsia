@@ -12,16 +12,16 @@ jobs:
   build-osx:
     runs-on: macos-latest
     env: 
-      RUSTC_WRAPPER: /home/runner/.cargo/bin/sccache   
+      RUSTC_WRAPPER: /Users/runner/.cargo/bin/sccache   
     steps:
     - uses: actions/checkout@v2
   
     # Install sccache from binary
     - run: |
-        sudo mkdir -p /home/runner/.cargo/bin || test 1
+        sudo mkdir -p /Users/runner/.cargo/bin || test 1
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-apple-darwin.tar.gz | tar xzf -
-        sudo mv sccache-v0.2.15-x86_64-apple-darwin/sccache /home/runner/.cargo/bin/sccache 
-        sudo chmod 755 /home/runner/.cargo/bin/sccache
+        sudo mv sccache-v0.2.15-x86_64-apple-darwin/sccache /Users/runner/.cargo/bin/sccache 
+        sudo chmod 755 /Users/runner/.cargo/bin/sccache
         sccache --start-server
 
     # Use sscache store in GitHub cache
