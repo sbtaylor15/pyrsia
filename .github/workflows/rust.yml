@@ -17,7 +17,7 @@ jobs:
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
       continue-on-error: true
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
       continue-on-error: true
     - run: cargo check --workspace --verbose  --release
     - run: |
@@ -35,7 +35,7 @@ jobs:
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
       continue-on-error: true
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
       continue-on-error: true
     - run: cargo check --tests --verbose
     - run: |
@@ -53,11 +53,11 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
 
     - name: Install openssl on macOS
       run: |
@@ -84,7 +84,7 @@ jobs:
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
       continue-on-error: true
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
       continue-on-error: true
     - run: cargo check --workspace --verbose  --release
     - run: |
@@ -102,7 +102,7 @@ jobs:
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
       continue-on-error: true
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
       continue-on-error: true
     - run: cargo check --tests --verbose
     - run: |
@@ -120,11 +120,11 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-    - run: unzip cache.zip -d /
+    - run: unzip -o cache.zip -d /
 
     # Install cargo deb and strip
     - name: Install cargo-deb cargo-strip
