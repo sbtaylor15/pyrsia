@@ -16,9 +16,9 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-      if: always()
+      continue-on-error: true
     - run: unzip cache.zip -d /
-      if: always()
+      continue-on-error: true
     - run: cargo check --workspace --verbose  --release
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -34,9 +34,9 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-      if: always()
+      continue-on-error: true
     - run: unzip cache.zip -d /
-      if: always()
+      continue-on-error: true
     - run: cargo check --tests --verbose
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -83,9 +83,9 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
-      if: always()
+      continue-on-error: true
     - run: unzip cache.zip -d /
-      if: always()
+      continue-on-error: true
     - run: cargo check --workspace --verbose  --release
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -101,9 +101,9 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
-      if: always()
+      continue-on-error: true
     - run: unzip cache.zip -d /
-      if: always()
+      continue-on-error: true
     - run: cargo check --tests --verbose
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
