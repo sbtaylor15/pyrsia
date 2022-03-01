@@ -18,10 +18,7 @@ jobs:
   
     # Install sccache from binary
     - run: |
-        sudo mkdir -p /Users/runner/.cargo/bin || test 1
-        curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-apple-darwin.tar.gz | tar xzf -
-        sudo mv sccache-v0.2.15-x86_64-apple-darwin/sccache /Users/runner/.cargo/bin/sccache 
-        sudo chmod 755 /Users/runner/.cargo/bin/sccache
+        .github/workflows/sccache-macos.sh
         sccache --start-server
 
     # Use sscache store in GitHub cache
@@ -41,14 +38,7 @@ jobs:
 
     - name: Build and Test Release Binaries
       run: |
-        set -x
-        cargo build --workspace --verbose --release 2>&1 1>/tmp/ws.log &
-        cargo build --tests --verbose --release 2>&1 1>/tmp/tests.log &
-        wait
-        echo cargo build --workspace --verbose --release
-        cat /tmp/ws.log
-        echo cargo build --tests --verbose --release
-        cat /tmp/tests.log
+        .github/workflows/build.sh 
         sccache --show-stats
 
   build:
@@ -60,10 +50,7 @@ jobs:
 
     # Install sccache from binary
     - run: |
-        sudo mkdir -p /home/runner/.cargo/bin || test 1
-        curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-        sudo mv sccache-v0.2.15-x86_64-unknown-linux-musl/sccache /home/runner/.cargo/bin/sccache 
-        sudo chmod 755 /home/runner/.cargo/bin/sccache
+        .github/workflows/sccache-linux.sh
         sccache --start-server
     
     # Use sscache store in GitHub cache
@@ -87,14 +74,7 @@ jobs:
     # Run cargo build in parallel using sscache to avoid OS locking errors
     - name: Build and Test Release Binaries
       run: |
-        set -x
-        cargo build --workspace --verbose --release 2>&1 1>/tmp/ws.log &
-        cargo build --tests --verbose --release 2>&1 1>/tmp/tests.log &
-        wait
-        echo cargo build --workspace --verbose --release
-        cat /tmp/ws.log
-        echo cargo build --tests --verbose --release
-        cat /tmp/tests.log
+        .github/workflows/build.sh
         sccache --show-stats   
   
     - name: Strip Binaries
