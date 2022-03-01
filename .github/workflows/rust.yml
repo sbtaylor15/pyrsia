@@ -9,44 +9,21 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-workspace-osx:
-    runs-on: macos-latest
-    env:
-      RUSTC_WRAPPER: ~/.cargo/bin/sccache     
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-aarch64-apple-darwin.tar.gz | tar xzf -
-        mv sccache-v0.2.15-aarch64-apple-darwin/sccache ~/.cargo/bin/sccache
-        chmod 755 ~/.cargo/bin/sccache
-        ~/.cargo/bin/sccache --start-server
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/sccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: |
-        cargo check --workspace --verbose  --release 2>&1 1>/tmp/ws.log &
-        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
-        wait
-        echo cargo check --workspace --verbose  --release
-        cat /tmp/ws.log
-        echo cargo check --tests --verbose --release
-        cat /tmp/tests.log
-        ~/.cargo/bin/sccache --show-stats
-
   build-osx:
-    needs: [check-workspace-osx, check-tests-osx]
     runs-on: macos-latest
     env: 
       RUSTC_WRAPPER: ~/.cargo/bin/sccache   
     steps:
     - uses: actions/checkout@v2
+  
+    # Install sccache from binary
     - run: |
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-aarch64-apple-darwin.tar.gz | tar xzf -
         mv sccache-v0.2.15-aarch64-apple-darwin/sccache ~/.cargo/bin/sccache
         chmod 755 ~/.cargo/bin/sccache
         sccache --start-server
+
+    # Use sscache store in GitHub cache
     - uses: actions/cache@v2
       with:
         path: ~/.cache/sccache
@@ -61,53 +38,42 @@ jobs:
       run: |
         sed -i.bak "/^version = \"0.1.0\"/s/\"\$/+${{ github.run_number }}\"/" Cargo.toml
 
+    # Run cargo check in parallel using sscache to avoid OS locking errors
+    - run: |
+        cargo check --workspace --verbose --release 2>&1 1>/tmp/ws.log &
+        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
+        wait
+        echo cargo check --workspace --verbose --release
+        cat /tmp/ws.log
+        echo cargo check --tests --verbose --release
+        cat /tmp/tests.log
+        sccache --show-stats
+
     - name: Build Release Binaries
       run: |
-        cargo build --workspace --verbose  --release
+        cargo build --workspace --verbose --release
+        sccache --show-stats
 
     - name: Execute Test Cases
       run: |
         cargo test --workspace --verbose --release
-        ~/.cargo/bin/sccache --show-stats
-
-  check-linux:
-    runs-on: ubuntu-latest
-    env: 
-      RUSTC_WRAPPER: ~/.cargo/bin/sccache   
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-dist-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-        mv sccache-0.2.12-x86_64-unknown-linux-musl/sccache ~/.cargo/bin/sccache
-        chmod 755 ~/.cargo/bin/sccache
-        ~/.cargo/bin/sccache --start-server
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/sccache
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-    - run: |
-        cargo check --workspace --verbose  --release 2>&1 1>/tmp/ws.log &
-        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
-        wait
-        echo cargo check --workspace --verbose  --release
-        cat /tmp/ws.log
-        echo cargo check --tests --verbose --release
-        cat /tmp/tests.log
-        ~/.cargo/bin/sccache --show-stats
+        sccache --show-stats
 
   build:
-    needs: [check-linux]
     runs-on: ubuntu-latest
     env:
       RUSTC_WRAPPER: ~/.cargo/bin/sccache     
     steps:
     - uses: actions/checkout@v2
+
+    # Install sccache from binary
     - run: |
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-dist-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xzf -
         mv sccache-0.2.12-x86_64-unknown-linux-musl/sccache ~/.cargo/bin/sccache
         chmod 755 ~/.cargo/bin/sccache
         sccache --start-server
+    
+    # Use sscache store in GitHub cache
     - uses: actions/cache@v2
       with:
         path: ~/.cache/sccache
@@ -125,14 +91,26 @@ jobs:
       run: |
         sed -i.bak "/^version = \"0.1.0\"/s/\"\$/+${{ github.run_number }}\"/" Cargo.toml
 
+    # Run cargo check in parallel using sscache to avoid OS locking errors
+    - run: |
+        cargo check --workspace --verbose --release 2>&1 1>/tmp/ws.log &
+        cargo check --tests --verbose --release 2>&1 1>/tmp/tests.log &
+        wait
+        echo cargo check --workspace --verbose --release
+        cat /tmp/ws.log
+        echo cargo check --tests --verbose --release
+        cat /tmp/tests.log
+        sccache --show-stats
+
     - name: Build Release Binaries
       run: |
-        cargo build --workspace --verbose  --release        
+        cargo build --workspace --verbose --release
+        sccache --show-stats        
         
     - name: Execute Test Cases
       run: |
         cargo test --workspace --verbose --release
-        ~/.cargo/bin/sccache --show-stats
+        sccache --show-stats
   
     - name: Strip Binaries
       run: |
