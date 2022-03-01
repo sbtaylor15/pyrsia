@@ -13,6 +13,12 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+      if: always()
+    - run: unzip cache.zip -d /
+      if: always()
     - run: cargo check --workspace --verbose  --release
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -25,6 +31,12 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
+      if: always()
+    - run: unzip cache.zip -d /
+      if: always()
     - run: cargo check --tests --verbose
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -68,6 +80,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-workspace-${{ hashFiles('**/Cargo.lock') }}
+      if: always()
+    - run: unzip cache.zip -d /
+      if: always()
     - run: cargo check --workspace --verbose  --release
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
@@ -80,6 +98,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: ${{ runner.os }}-cargo-tests-${{ hashFiles('**/Cargo.lock') }}
+      if: always()
+    - run: unzip cache.zip -d /
+      if: always()
     - run: cargo check --tests --verbose
     - run: |
         zip -r cache.zip  ~/.cargo/bin/ ~/.cargo/registry/index/ ~/.cargo/registry/cache/ ~/.cargo/git/db/ $PWD/target/
