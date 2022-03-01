@@ -142,9 +142,9 @@ jobs:
         private_key: ${{ secrets.GPG_PRIVATE }}
         key_passphrase: ${{ secrets.GPG_SECRET }}
         github_repository: pyrsia/pyrsia.github.io
-    
+  
+  # Coverage wipes the cache in order to instrument the code.  No need to wait for other jobs to run it.
   coverage:
-    needs: [check-tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
