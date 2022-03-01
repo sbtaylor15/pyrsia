@@ -18,10 +18,10 @@ jobs:
   
     # Install sccache from binary
     - run: |
-        mkdir -p /home/runner/.cargo/bin || test 1
+        sudo mkdir -p /home/runner/.cargo/bin || test 1
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-apple-darwin.tar.gz | tar xzf -
-        mv sccache-v0.2.15-x86_64-apple-darwin/sccache /home/runner/.cargo/bin/sccache 
-        chmod 755 /home/runner/.cargo/bin/sccache
+        sudo mv sccache-v0.2.15-x86_64-apple-darwin/sccache /home/runner/.cargo/bin/sccache 
+        sudo chmod 755 /home/runner/.cargo/bin/sccache
         sccache --start-server
 
     # Use sscache store in GitHub cache
@@ -69,10 +69,10 @@ jobs:
 
     # Install sccache from binary
     - run: |
-        mkdir -p /home/runner/.cargo/bin || test 1
+        sudo mkdir -p /home/runner/.cargo/bin || test 1
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-        mv sccache-v0.2.15-x86_64-unknown-linux-musl/sccache /home/runner/.cargo/bin/sccache 
-        chmod 755 /home/runner/.cargo/bin/sccache
+        sudo mv sccache-v0.2.15-x86_64-unknown-linux-musl/sccache /home/runner/.cargo/bin/sccache 
+        sudo chmod 755 /home/runner/.cargo/bin/sccache
         sccache --start-server
     
     # Use sscache store in GitHub cache
