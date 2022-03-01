@@ -62,7 +62,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUSTC_WRAPPER: /home/runner/.cargo/bin/sccache     
+      RUSTC_WRAPPER: /Users/runner/.cargo/bin/sccache     
     steps:
     - uses: actions/checkout@v2
 
