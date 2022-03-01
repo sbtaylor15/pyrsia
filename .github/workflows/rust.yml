@@ -69,7 +69,7 @@ jobs:
     # Install sccache from binary
     - run: |
         curl -o- -sSLf https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-dist-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xzf -
-        mv sccache-0.2.12-x86_64-unknown-linux-musl/sccache ~/.cargo/bin/sccache
+        mv sccache-dist-v0.2.15-x86_64-unknown-linux-musl/sccache-dist ~/.cargo/bin/sccache
         chmod 755 ~/.cargo/bin/sccache
         sccache --start-server
     
