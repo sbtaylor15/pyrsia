@@ -99,7 +99,7 @@ jobs:
     - name: Upload Pyrsia .deb to website repo
       uses: sbtaylor15/apt-repo-action@v2.0.4
       # Only when we push on the main repository should we upload the results
-      if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       with:
         github_token: ${{ secrets.APT }}
         repo_supported_version: |
@@ -107,12 +107,12 @@ jobs:
         repo_supported_arch: |
           amd64
         page_branch: gh-pages
-        file: /github/workspace/$PWD/target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb
+        file: /github/workspace/target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb
         file_target_version: focal
         public_key: ${{ secrets.GPG_PUBLIC }}
         private_key: ${{ secrets.GPG_PRIVATE }}
         key_passphrase: ${{ secrets.GPG_SECRET }}
-        github_repository: pyrsia/pyrsia.github.io
+        github_repository: sbtaylor15/sbtaylor15.github.io
   
   # Coverage wipes the cache in order to instrument the code.  No need to wait for other jobs to run it.
   coverage:
