@@ -30,10 +30,6 @@ jobs:
         sccache --start-server
         sccache --show-stats
 
-    - name: Install openssl on macOS
-      run: |
-        brew install openssl
-
     # Need to add build number to version number
     - name: Add Build to Version Number
       run: |
@@ -46,7 +42,7 @@ jobs:
 
     - name: Execute Test Cases
       run: |
-        cargo test --workspace --verbose
+        cargo test --workspace --verbose --release
 
   build-push-linux:
     runs-on: ubuntu-latest
@@ -88,7 +84,7 @@ jobs:
 
     - name: Execute Test Cases
       run: |
-        cargo test --workspace --verbose
+        cargo test --workspace --verbose --release
 
     # Strip binaries 
     - name: Strip Binaries
@@ -107,7 +103,7 @@ jobs:
     - name: Upload Pyrsia .deb to website repo
       uses: sbtaylor15/apt-repo-action@v2.0.4
       # Only when we push on the main repository should we upload the results
-      if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       with:
         github_token: ${{ secrets.APT }}
         repo_supported_version: |
@@ -120,7 +116,7 @@ jobs:
         public_key: ${{ secrets.GPG_PUBLIC }}
         private_key: ${{ secrets.GPG_PRIVATE }}
         key_passphrase: ${{ secrets.GPG_SECRET }}
-        github_repository: pyrsia/pyrsia.github.io
+        github_repository: sbtaylor15/sbtaylor15.github.io
   
   # Coverage wipes the cache in order to instrument the code.  No need to wait for other jobs to run it.
   coverage:
