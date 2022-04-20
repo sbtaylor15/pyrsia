@@ -98,25 +98,25 @@ jobs:
         command: deb
         args: --no-build -v
 
+    # Login to GCS
+    - name: Google Auth
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    # Add gsutils
+    - name: Set up Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v0'
+
     # Add the prysia .deb file to the apt repo which is part of
     # the github website repo
-    - name: Upload Pyrsia .deb to website repo
-      uses: sbtaylor15/apt-repo-action@v2.0.4
+    - name: Upload Pyrsia .deb to GCS repo
       # Only when we push on the main repository should we upload the results
-      if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
-      with:
-        github_token: ${{ secrets.APT }}
-        repo_supported_version: |
-          focal
-        repo_supported_arch: |
-          amd64
-        page_branch: gh-pages
-        file: /github/workspace/target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb
-        file_target_version: focal
-        public_key: ${{ secrets.GPG_PUBLIC }}
-        private_key: ${{ secrets.GPG_PRIVATE }}
-        key_passphrase: ${{ secrets.GPG_SECRET }}
-        github_repository: pyrsia/pyrsia.github.io
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
+      run: |
+        .github/workflows/aptly.sh target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb nightly 
+      env: 
+        GPG_KEY: ${{ secrets.GPG_KEY }}
   
   # Coverage wipes the cache in order to instrument the code.  No need to wait for other jobs to run it.
   coverage:
