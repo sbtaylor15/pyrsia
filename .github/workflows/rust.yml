@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  release: 
+    types: [published]
 
 env:
   CARGO_TERM_COLOR: always
@@ -108,13 +110,21 @@ jobs:
     - name: Set up Cloud SDK
       uses: 'google-github-actions/setup-gcloud@v0'
 
-    # Add the prysia .deb file to the apt repo which is part of
-    # the github website repo
-    - name: Upload Pyrsia .deb to GCS repo
+    # Add the prysia .deb file to the NIGHTLY apt repo which resides on GCS
+    - name: Upload Pyrsia .deb to NIGHTLY GCS repo
       # Only when we push on the main repository should we upload the results
       if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       run: |
         .github/workflows/aptly.sh target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb nightly 
+      env: 
+        GPG_KEY: ${{ secrets.GPG_KEY }}
+    
+    # Add the prysia .deb file to the STABLE apt repo which resides on GCS
+    - name: Publish Release to STABLE GCS repo
+      # Only when we push on the main repository should we upload the results
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'published'
+      run: |
+        .github/workflows/aptly.sh target/debian/pyrsia_0.1.0+${{ github.run_number }}_amd64.deb stable 
       env: 
         GPG_KEY: ${{ secrets.GPG_KEY }}
   
