@@ -90,11 +90,13 @@ jobs:
 
     # Strip binaries 
     - name: Strip Binaries
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'    
       run: |
         cargo strip
 
     # Create Pyrsia .deb file
     - name: Package Pyrsia as deb file
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       uses: actions-rs/cargo@v1.0.3
       with:
         command: deb
@@ -102,16 +104,18 @@ jobs:
 
     # Login to GCS
     - name: Google Auth
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       uses: 'google-github-actions/auth@v0'
       with:
         credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
     # Add gsutils
     - name: Set up Cloud SDK
+      if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       uses: 'google-github-actions/setup-gcloud@v0'
 
     # Add the prysia .deb file to the NIGHTLY apt repo which resides on GCS
-    - name: Upload Pyrsia .deb to NIGHTLY GCS repo
+    - name: Publish Build to NIGHTLY GCS repo
       # Only when we push on the main repository should we upload the results
       if: github.repository_owner == 'sbtaylor15' && github.event_name == 'push'
       run: |
