@@ -3527,7 +3527,7 @@ name = "pyrsia_central_node"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "clap 3.1.17",
+ "clap 3.1.18",
  "futures",
  "hex",
  "libp2p",
@@ -4342,9 +4342,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.23.10"
+version = "0.23.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4eea2ed6847da2e0c7289f72cb4f285f0bd704694ca067d32be811b2a45ea858"
+checksum = "357eb8e7f7fecff8e2387cff7239da9621a97bf9cb8343ce24b4122fd3a40538"
 dependencies = [
  "cfg-if 1.0.0",
  "core-foundation-sys",
