@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
     paths:  # Make sure to keep sync'd https://github.com/pyrsia/pyrsia/blob/main/.github/workflows/rust-lint-skipped.yml#L8
-      - .github/workflows/lint.yml
+      - .github/workflows/rust-lint.yml
       - .github/workflows/.cargo/audit.toml
       - '**/*.rs'
       - '**/Cargo.toml'
@@ -64,17 +64,19 @@ jobs:
             bin/woke --exit-1-on-failure
         shell: bash
 
-  markdown-docs:
+  superlinter:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: github/super-linter/slim@v4
+      - uses: github/super-linter@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_PYTHON: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_JSON: true
+          VALIDATE_XML: true
+          VALIDATE_BASH: true
+          LOG_LEVEL: NOTICE
           MARKDOWN_CONFIG_FILE: .markdownlint.yaml
-          FILTER_REGEX_INCLUDE: .*\.[md|mdx]
-          FILTER_REGEX_EXCLUDE: pull_request_template\.md
-          VALIDATE_EDITORCONFIGE: false
-          VALIDATE_GITLEAKS: false
-          VALIDATE_NATURAL_LANGUAGE: false
-          MULTI_STATUS: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
